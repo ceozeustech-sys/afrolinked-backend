@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProfileState {
+  draft
+  pending
+  verified
+  under_review
+  suspended
+}
+
+enum VerificationTier {
+  basic
+  verified
+  trusted
+}
+
+model User {
+  id                String           @id @default(uuid())
+  phone             String           @unique
+  refreshTokenHash  String?
+  verificationTier  VerificationTier @default(basic)
+  profileState      ProfileState     @default(draft)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  profile           Profile?
+}
+
+model Profile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id])
+  roleTitle       String?
+  sector          String?
+  country         String?
+  regions         Json?
+  yearsExperience Int?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ProfileStateLog {
+  id        String         @id @default(uuid())
+  userId    String
+  fromState ProfileState
+  toState   ProfileState
+  trigger   String
+  createdAt DateTime       @default(now())
+}
