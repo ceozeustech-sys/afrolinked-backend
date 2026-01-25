@@ -1,29 +1,31 @@
 import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import dotenv from 'dotenv';
+import { createServer } from 'http';
+import searchRoutes from './search/search.routes';
 import profileRoutes from './profiles/profile.routes';
 import internalRoutes from './internal/internal.routes';
-import searchRoutes from './search/search.routes';
 import { authenticate } from './shared/middleware/auth.middleware';
 
-dotenv.config();
-
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
-app.use(helmet());
-app.use(cors());
 app.use(express.json());
 
-app.use('/api/profiles', authenticate, profileRoutes);
-app.use('/api/internal', internalRoutes);
+// Public routes (with auth middleware)
 app.use('/api/search', authenticate, searchRoutes);
+app.use('/api/profiles', authenticate, profileRoutes);
 
-app.get('/', (req, res) => {
-  res.json({ message: 'Afrolinked Backend' });
+// Internal routes (protected by internalAuth)
+app.use('/api/internal', internalRoutes);
+
+// Health check
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK' });
 });
 
-app.listen(PORT, () => {
-  console.log(`✅ Afrolinked backend running on http://localhost:${PORT}`);
+const server = createServer(app);
+
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ Afrolinked backend running on port ${PORT}`);
 });
+
+export default server;

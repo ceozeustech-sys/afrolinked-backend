@@ -6,7 +6,7 @@ async function main() {
   // Create test user
   const user = await prisma.user.create({
     data: {
-      phone: '+27000000000',
+      phone: '+27796288382',
       verificationTier: 'basic',
       profileState: 'draft'
     }
