@@ -10,6 +10,12 @@ const PORT = parseInt(process.env.PORT || '3000', 10);
 
 app.use(express.json());
 
+// Global request logger
+app.use((req, res, next) => {
+  console.log('🌐 [GLOBAL] Incoming request:', req.method, req.path);
+  next();
+});
+
 // Public routes (with auth middleware)
 app.use('/api/search', authenticate, searchRoutes);
 app.use('/api/profiles', authenticate, profileRoutes);
