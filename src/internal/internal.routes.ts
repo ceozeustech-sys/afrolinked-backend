@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { internalAuth } from '../shared/middleware/internalAuth.middleware';
 import { approveProfile, flagProfile, suspendProfile } from './trustEngine.service';
+import { seedVerifiedUser } from './seed-verified-user';
 
 const router = Router();
 
@@ -36,5 +37,8 @@ router.post('/suspend-profile', internalAuth, async (req, res) => {
     res.status(400).json({ error: (error as Error).message });
   }
 });
+
+// Temporary: ensure verified user exists
+router.post('/seed-verified-user', internalAuth, seedVerifiedUser);
 
 export default router;
